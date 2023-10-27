@@ -1,53 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Dylan's Pokédex</title>
-    <link rel="stylesheet" href="./style.css">
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-  </head>
-  <body>
-    <main>
-        <h1>Dylan's Online Pokédex</h1>
-        
-        <form>
-            <input id="search-bar" type="text" placeholder="Enter name or ID here">
-            <input type="submit">
-        </form>
 
-        <table id="search-result">
-            <thead>
-              <tr>
-                <th colspan="2" rowspan="2" id="sprite"></th>
-                <th id="name"></th>
-                <th id="dex-no"></th>
-              </tr>
-              <tr>
-                <th colspan="2" id="types"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colspan="2" id="flavor-text"></td>
-                <td colspan="2" id="abilities"></td>
-              </tr>
-              <tr>
-                <td id="prev-pkmn">
-                    <input type="button" value="⇦"></input>
-                </td>
-                <td></td>
-                <td></td>
-                <td id="next-pkmn">
-                    <input type="button" value="⇨"></input>
-                </td>
-              </tr>
-            </tbody>
-        </table>
-    </main>
-	<script src="index.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Dylan's Pokédex</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="icon" href="./favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+  <main>
+    <h1>Dylan's Online Pokédex</h1>
+
+    <form>
+      <label for="search-bar">Search for a Pokémon:</label>
+      <input id="search-bar" type="text" placeholder="Enter name or ID" />
+      <input type="submit">
+    </form>
+
+    <table id="search-result">
+      <thead>
+        <tr>
+          <th id="name" colspan="3"></th>
+          <th id="dex-no"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th id="sprite" colspan="2" rowspan="2"></th>
+          <th colspan="2" id="types"></th>
+        </tr>
+        <tr>
+          <td colspan="2" id="abilities"></td>
+        </tr>
+        <tr>
+          <td colspan="4" id="flavor-text"></td>
+        </tr>
+        <tr>
+          <td id="prev-pkmn">
+            <input id="prev-pkmn-btn" type="button" value="⇦"></input>
+          </td>
+          <td></td>
+          <td></td>
+          <td id="next-pkmn">
+            <input id="next-pkmn-btn" type="button" value="⇨"></input>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+  <script src="index.js"></script>
+</body>
+
 </html>
 
 <!-- HTML template provided by https://www.freecodecamp.org/news/html-starter-template-a-basic-html5-boilerplate-for-index-html/ -->

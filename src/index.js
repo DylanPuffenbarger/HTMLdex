@@ -1,3 +1,4 @@
+const search_bar = document.getElementById('search-bar')
 const output = {
   'sprite': document.getElementById('sprite'),
   'name': document.getElementById('name'),
@@ -6,6 +7,8 @@ const output = {
   'flavor_text': document.getElementById('flavor-text'),
   'abilities': document.getElementById('abilities'),
 }
+const prevButton = document.getElementById('prev-pkmn');
+const nextButton = document.getElementById('next-pkmn')
 const totalPokemon = 1017;
 
 const titleCase = (str) => {
@@ -77,18 +80,25 @@ function parsePokemon(pokemon, species, is_button = false){
     'flavor_text':  getFlavorText(),
     'abilities':    getAbilities()
   }
-  console.log(data_out)
-  renderPokemon(data_out);
+  // console.log(data_out)
+  return renderPokemon(data_out);
 }
 
 function renderPokemon(data){
   clearScreen();
   output.sprite.innerHTML = `<img src='${data.sprite}' alt='${data.name}'>`;
+  
   output.name.innerHTML = `<h2>${data.name}</h2>`
-  output.dex_no.innerHTML = `#${'0'.repeat(4 - Math.log10(data.dex_no)) + data.dex_no}`
+  
+  output.dex_no.innerHTML = `#${'0'.repeat(4 - Math.log10(data.dex_no+1)) + data.dex_no}`
+  output.dex_no.value = data.dex_no;
+
   output.flavor_text.innerHTML = `<p>${data.flavor_text}</p>`
+  
   output.abilities.innerHTML = `<div><h3>Abilities</h3></div>`
+  
   data.types.forEach((type) => output.types.innerHTML += `<img src="images/${type}.png" alt="${titleCase(type)}">`)
+  
   data.abilities.forEach((ability) => {
     output.abilities.innerHTML += `
     <div>${ability.is_hidden?'<i>':''}
@@ -96,3 +106,27 @@ function renderPokemon(data){
     ${ability.is_hidden?'</i>':''}</div>`
   })
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetchPokemon(Math.floor(Math.random() * totalPokemon) + 1)
+  
+  document.addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    fetchPokemon(search_bar.value);
+  });
+
+  nextButton.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    fetchPokemon(output.dex_no.value%totalPokemon + 1);
+  });
+
+  prevButton.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    if(output.dex_no.value === 1){
+      fetchPokemon(totalPokemon);
+    }else{
+      fetchPokemon(output.dex_no.value - 1);
+    }
+  })
+})

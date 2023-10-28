@@ -1,21 +1,17 @@
-const output_table = {
+const output = {
   'sprite': document.getElementById('sprite'),
   'name': document.getElementById('name'),
   'dex_no': document.getElementById('dex-no'),
   'types': document.getElementById('types'),
   'flavor_text': document.getElementById('flavor-text'),
   'abilities': document.getElementById('abilities'),
-  'prev_pkmn': document.getElementById('prev-pkmn'),
-  'next_pkmn': document.getElementById('next-pkmn')
 }
 const totalPokemon = 1017;
 
 const titleCase = (str) => {
-  let words = str.split(' ');
-  if(words.length === 1){
-    return words[0][0].toUpperCase() + words[0].slice(1);
-  }
-  return ([titleCase(words[0])].concat(words.slice(1))).join(' ');
+  return str.replace(/\w+/g, function(word) {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  });
 }
 const copyValuesByKey = (obj_in, keys) => {
   let obj_out = {};
@@ -23,6 +19,12 @@ const copyValuesByKey = (obj_in, keys) => {
   keys.forEach((key) => obj_out[key] = obj_in[key]);
   console.log(obj_out);
   return obj_out;
+}
+
+function clearScreen(){
+  for(key in output){
+    output[key].innerHTML = '';
+  }
 }
 
 function fetchPokemon(input, is_button = false) {
@@ -43,9 +45,6 @@ function parsePokemon(pokemon, species, is_button = false){
   const getSprite = () => pokemon.sprites.front_default;
   const getName = () => {
     return species.names.find((entry) => entry.language.name === 'en').name;
-  }
-  const getSmallSprite = () => {
-    return pokemon.sprites.versions['generation-viii'].icons.front_default
   }
   const getTypes = () => {
     let types = [];
@@ -79,5 +78,21 @@ function parsePokemon(pokemon, species, is_button = false){
     'abilities':    getAbilities()
   }
   console.log(data_out)
-  // renderPkmn(data_out);
+  renderPokemon(data_out);
+}
+
+function renderPokemon(data){
+  clearScreen();
+  output.sprite.innerHTML = `<img src='${data.sprite}' alt='${data.name}'>`;
+  output.name.innerHTML = `<h2>${data.name}</h2>`
+  output.dex_no.innerHTML = `#${'0'.repeat(4 - Math.log10(data.dex_no)) + data.dex_no}`
+  output.flavor_text.innerHTML = `<p>${data.flavor_text}</p>`
+  output.abilities.innerHTML = `<div><h3>Abilities</h3></div>`
+  data.types.forEach((type) => output.types.innerHTML += `<img src="images/${type}.png" alt="${titleCase(type)}">`)
+  data.abilities.forEach((ability) => {
+    output.abilities.innerHTML += `
+    <div>${ability.is_hidden?'<i>':''}
+    ${ability.name}</div>
+    ${ability.is_hidden?'</i>':''}</div>`
+  })
 }

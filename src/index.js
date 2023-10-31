@@ -19,6 +19,10 @@ fetch("https://pokeapi.co/api/v2/pokemon-species?limit=100000&offset=0")
   totalPokemon = json.count;
 });
 
+function fullMatch(target, regexp){
+  return String(target).match(regexp);
+}
+
 function titleCase(str){
   const wordList = str.split(' ');
   if(wordList.length === 0){
@@ -26,7 +30,7 @@ function titleCase(str){
   }else if(wordList.length === 1){
     return str[0].toUpperCase() + str.slice(1).toLowerCase();
   }else{
-    return `${titleCase(wordList[0])} ${titleCase(wordList.split(1))}`
+    return `${titleCase(wordList[0])} ${titleCase(wordList.slice(1).join(' '))}`
   }
 }
 function copyValuesByKey(obj_in, keys){
@@ -47,6 +51,9 @@ function clearScreen(){
 }
 
 async function fetchPokemon(input) {
+  if(fullMatch(input, /\d/)){
+    input = Number(input);
+  }
   const resp_1 = await
     fetch(`https://pokeapi.co/api/v2/pokemon-species/${String(input).replace(/\s+/,'-')}`);
   
@@ -199,6 +206,19 @@ let currentPkmnId
 let currentPkmnData
 
 async function main(){
+  async function nextPkmn(){
+    currentPkmnData = await fetchPokemon((currentPkmnId) % totalPokemon + 1);
+    currentPkmnId = await currentPkmnData.dex_no;
+  }
+  async function prevPkmn(){
+    if(currentPkmnId === 1){
+      currentPkmnData = await fetchPokemon(totalPokemon);
+    }else{
+      currentPkmnData = await fetchPokemon(currentPkmnId-1);
+    }
+    currentPkmnId = await currentPkmnData.dex_no;
+  }
+
   currentPkmnData = await fetchPokemon(Math.floor(Math.random() * totalPokemon) + 1);
   currentPkmnId = await currentPkmnData.dex_no;
 
@@ -209,31 +229,20 @@ async function main(){
   });
 
   document.addEventListener("keydown", function(ev){
-    // ev.preventDefault();
+    // console.log(ev.key);
     if(ev.key === ' '){
       artMode = !artMode;
       renderPokemon(currentPkmnData);
     }
+    if(ev.key === 'ArrowRight') nextPkmn();
+    if(ev.key === 'ArrowLeft') prevPkmn();
   });
 
   nextButton.addEventListener('mousedown', async function(ev){
-    // ev.preventDefault();
-    if(ev.button === 0){
-      currentPkmnId = (currentPkmnId % totalPokemon) + 1
-      currentPkmnData = await fetchPokemon(currentPkmnId);
-    }
+    if (ev.button === 0) nextPkmn();
   });
 
   prevButton.addEventListener('mousedown', async function(ev){
-    // ev.preventDefault();
-    if(ev.button === 0){
-      if(currentPkmnId === 1){
-        currentPkmnData = await fetchPokemon(totalPokemon);
-        currentPkmnId = await currentPkmnData.dex_no;
-      }else{
-        currentPkmnData = await fetchPokemon(currentPkmnId-1);
-        currentPkmnId = await currentPkmnData.dex_no;
-      }
-    }
+    if(ev.button === 0) prevPkmn();
   });
 }

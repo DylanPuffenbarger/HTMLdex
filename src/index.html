@@ -5,39 +5,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Dylan's Pokédex</title>
+  <title>HTMLdex</title>
   <link rel="stylesheet" href="./style.css">
   <link rel="icon" href="./images/favicon.ico" type="image/x-icon">
 </head>
 
 <body>
   <main>
-    <h1>Dylan's Online Pokédex</h1>
+    <section id="page-header">
+    <h1>HTMLdex</h1>
 
     <form>
       <label for="search-bar">Search for a Pokémon:</label>
       <input id="search-bar" type="text" placeholder="Enter name or ID" />
       <input type="submit">
     </form>
+    </section>
 
     <table id="search-result">
       <thead>
         <tr>
-          <th id="name" colspan="3"></th>
-          <th id="dex-no"></th>
+          <th id="name" colspan="3" class="output-segment"></th>
+          <th id="dex-no"  class="output-segment"></th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <th id="sprite" colspan="2" rowspan="2"></th>
-          <th colspan="2" id="types"></th>
+          <th id="sprite" class="output-segment" colspan="2" rowspan="2"></th>
+          <th id="types" colspan="2"></th>
         </tr>
         <tr>
           <td id="abilities-label"></td>
           <td id="abilities"></td>
         </tr>
         <tr>
-          <td colspan="4" id="flavor-text"></td>
+          <td colspan="4" id="flavor-text" class="output-segment"></td>
         </tr>
         <tr>
           <td id="prev-pkmn">

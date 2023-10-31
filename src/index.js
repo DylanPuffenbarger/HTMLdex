@@ -20,9 +20,14 @@ fetch("https://pokeapi.co/api/v2/pokemon-species?limit=100000&offset=0")
 });
 
 function titleCase(str){
-  return str.replace(/\w+/g, function(word) {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  });
+  const wordList = str.split(' ');
+  if(wordList.length === 0){
+    return str;
+  }else if(wordList.length === 1){
+    return str[0].toUpperCase() + str.slice(1).toLowerCase();
+  }else{
+    return `${titleCase(wordList[0])} ${titleCase(wordList.split(1))}`
+  }
 }
 function copyValuesByKey(obj_in, keys){
   let obj_out = {};
@@ -43,12 +48,35 @@ function clearScreen(){
 
 async function fetchPokemon(input) {
   const resp_1 = await
-    fetch(`https://pokeapi.co/api/v2/pokemon-species/${input}`);
-  const species = await resp_1.json();
+    fetch(`https://pokeapi.co/api/v2/pokemon-species/${String(input).replace(/\s+/,'-')}`);
   
-  const resp_2 = await fetch(species.varieties[0].pokemon.url);
-  const pokemon = await resp_2.json();
-  return parsePokemon(pokemon, species);
+  if(resp_1.status !== 200){
+    return renderPokemon({
+      'sprites': {
+        'official_art': './images/error.png',
+        'pixel_sprite': './images/error.png'
+      },
+      'name': 'ERROR',
+      'dex_no': NaN,
+      'types': [],
+      'flavor_text': "The Pokémon you were searching for couldn't be found.</p><p>Your search query may have been misspelled or invalid. ((+_+))",
+      'abilities': [
+        {
+          'name': '(╯°□°）╯︵ ┻━┻',
+          'is_hidden': false
+        },
+        {
+          'name': '(°_°)',
+          'is_hidden': true
+        }
+      ]
+    });
+  } else {
+    const species = await resp_1.json();
+    const resp_2 = await fetch(species.varieties[0].pokemon.url);
+    const pokemon = await resp_2.json();
+    return parsePokemon(pokemon, species);
+  }
 }
 
 
@@ -72,6 +100,9 @@ function parsePokemon(pokemon, species){
     return types;
   }
   const getFlavorText = () => {
+    if(species.flavor_text_entries.length === 0){
+      return 'No known data'
+    }
     return species.flavor_text_entries
     .findLast((entry) => entry.language.name === 'en').flavor_text;
   }
@@ -80,7 +111,7 @@ function parsePokemon(pokemon, species){
     pokemon.abilities.forEach(
       (entry) => abilities.push(
         {
-          'name':       titleCase(entry.ability.name.replace('-',' ')),
+          'name':       titleCase(entry.ability.name.replaceAll('-',' ')),
           'is_hidden':  entry.is_hidden
         }
       ));
@@ -132,12 +163,14 @@ function renderPokemon(data){
 
     const abList = document.createElement('ul');
     data.abilities.forEach((ability) => {
-      const abNode = document.createElement('li');
-      abNode.innerHTML = 
-      `${ability.is_hidden?'<i>':''}
-      ${ability.name}
-      ${ability.is_hidden?'</i>':''}`;
-      abList.appendChild(abNode);
+      if(!(ability.name === data.abilities[0].name && ability.is_hidden)){
+        const abNode = document.createElement('li');
+        abNode.innerHTML = 
+          `${ability.is_hidden?'<i>':''}
+          ${ability.name}
+          ${ability.is_hidden?'</i>':''}`;
+        abList.appendChild(abNode);
+      }
     });
     outputWindow.abilities.appendChild(abList);
   }
@@ -157,6 +190,7 @@ function renderPokemon(data){
   renderFlavorText();
   renderAbilities();
   renderTypes();
+  return data;
 }
 
 document.addEventListener("DOMContentLoaded", main);
@@ -171,7 +205,7 @@ async function main(){
   document.addEventListener("submit", async function(ev){
     ev.preventDefault();
     currentPkmnData = await fetchPokemon(search_bar.value);
-    currentPkmnId = await currentPkmnData.dex_no
+    currentPkmnId = await currentPkmnData.dex_no;
   });
 
   document.addEventListener("keydown", function(ev){
@@ -194,11 +228,12 @@ async function main(){
     // ev.preventDefault();
     if(ev.button === 0){
       if(currentPkmnId === 1){
-        currentPkmnId = totalPokemon;
+        currentPkmnData = await fetchPokemon(totalPokemon);
+        currentPkmnId = await currentPkmnData.dex_no;
       }else{
-        currentPkmnId--;
+        currentPkmnData = await fetchPokemon(currentPkmnId-1);
+        currentPkmnId = await currentPkmnData.dex_no;
       }
-      currentPkmnData = await fetchPokemon(currentPkmnId);
     }
   });
 }

@@ -1,0 +1,52 @@
+#abilities {
+    text-align: left;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+}
+
+#abilities-label {
+    text-align: right;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+}
+
+#name {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+}
+
+#next-pkmn-btn {
+    float: right
+}
+
+.output-segment{
+    border: 5px solid teal;
+    border-radius: 4px;
+    background: linear-gradient(to top, lightblue, teal), url(https://picsum.photos/1280/853/?random=1) no-repeat top center; /* https://stackoverflow.com/a/60320143 */
+    padding: 10px;
+}
+
+#search-result{
+    background-color: rgb(165, 44, 44);
+    border-radius: 0;
+    max-width: 600px;
+    margin: auto;
+}
+
+#sprite>img{
+    height: 150px;
+    width: auto;
+}
+
+#types>img {
+    border: 5px solid teal;
+    border-radius: 4px;
+    width: 100px;
+}
+
+#page-header>*{
+    text-align: center;
+}
+
+#flavor-text>*,#dex-no{
+    font-family: 'Courier New', Courier, monospace;
+    /* font-weight: bold; */
+}

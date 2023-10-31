@@ -141,10 +141,14 @@ function parsePokemon(pokemon, species){
 function renderPokemon(data){
   const renderSprite = () => {
     const sprite = document.createElement('img');
+    const source =
+      artMode? data.sprites.official_art
+      : data.sprites.pixel_sprite;
+
     sprite.alt = data.name;
     sprite.src =
-      artMode?  data.sprites.official_art
-      :         data.sprites.pixel_sprite
+      (source === null)? './images/null_sprite.png'
+      : source;
     outputWindow.sprite.appendChild(sprite);
   }
   const renderName = () => {
@@ -229,14 +233,17 @@ async function main(){
   });
 
   document.addEventListener("keydown", function(ev){
-    // console.log(ev.key);
-    if(ev.key === ' '){
-      artMode = !artMode;
-      renderPokemon(currentPkmnData);
+    if(ev.target !== search_bar){
+      if(ev.key === ' '){
+        artMode = !artMode;
+        renderPokemon(currentPkmnData);
+      }
+      if(ev.key === 'ArrowRight') nextPkmn();
+      if(ev.key === 'ArrowLeft') prevPkmn();
     }
-    if(ev.key === 'ArrowRight') nextPkmn();
-    if(ev.key === 'ArrowLeft') prevPkmn();
   });
+    
+    
 
   nextButton.addEventListener('mousedown', async function(ev){
     if (ev.button === 0) nextPkmn();

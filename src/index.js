@@ -60,8 +60,8 @@ async function fetchPokemon(input) {
   if(resp_1.status !== 200){
     return renderPokemon({
       'sprites': {
-        'official_art': './images/error.png',
-        'pixel_sprite': './images/error.png'
+        'official_art': './src/images/error.png',
+        'pixel_sprite': './src/images/error.png'
       },
       'name': 'ERROR',
       'dex_no': NaN,
@@ -147,7 +147,7 @@ function renderPokemon(data){
 
     sprite.alt = data.name;
     sprite.src =
-      (source === null)? './images/null_sprite.png'
+      (source === null)? './src/images/null_sprite.png'
       : source;
     outputWindow.sprite.appendChild(sprite);
   }
@@ -188,7 +188,7 @@ function renderPokemon(data){
   const renderTypes = () => {
     data.types.forEach((type) => {
       const typeIcon = document.createElement('img');
-      typeIcon.src = `images/${type}.png`;
+      typeIcon.src = `./src/images/${type}.png`;
       typeIcon.alt = titleCase(type);
       outputWindow.types.appendChild(typeIcon);
     });

@@ -1,13 +1,5 @@
 const search_bar = document.getElementById('search-bar')
-const outputWindow = {
-  'sprite': document.getElementById('sprite'),
-  'name': document.getElementById('name'),
-  'dex_no': document.getElementById('dex-no'),
-  'types': document.getElementById('types'),
-  'flavor_text': document.getElementById('flavor-text'),
-  'abilities': document.getElementById('abilities'),
-  'abilities_label': document.getElementById('abilities-label')
-}
+const output = document.getElementById('output');
 const prevButton = document.getElementById('prev-pkmn');
 const nextButton = document.getElementById('next-pkmn')
 let artMode = false;
@@ -20,7 +12,7 @@ fetch("https://pokeapi.co/api/v2/pokemon-species?limit=100000&offset=0")
 });
 
 function fullMatch(target, regexp){
-  return String(target).match(regexp);
+  return String(target).match(regexp)[0] === String(target);
 }
 
 function titleCase(str){
@@ -33,35 +25,23 @@ function titleCase(str){
     return `${titleCase(wordList[0])} ${titleCase(wordList.slice(1).join(' '))}`
   }
 }
-function copyValuesByKey(obj_in, keys){
-  let obj_out = {};
-  
-  keys.forEach((key) => obj_out[key] = obj_in[key]);
-  console.log(obj_out);
-  return obj_out;
-}
 
 function clearScreen(){
-  for(key in outputWindow){
-    let element = outputWindow[key];
-    while(element.hasChildNodes()){
-      element.removeChild(element.firstChild)
-    }
+  while(output.hasChildNodes()){
+    output.removeChild(output.firstChild);
   }
 }
 
-async function fetchPokemon(input) {
-  if(fullMatch(input, /\d/)){
-    input = Number(input);
-  }
+async function fetchPokemon(input, depth=4) {
+  if(depth === 4) clearScreen;
+  input = String(input);
   const resp_1 = await
     fetch(`https://pokeapi.co/api/v2/pokemon-species/${String(input).replace(/\s+/,'-')}`);
-  
   if(resp_1.status !== 200){
     return renderPokemon({
       'sprites': {
         'official_art': './src/images/error.png',
-        'pixel_sprite': './src/images/error.png'
+        'pixel_sprite': './src/images/error.png',
       },
       'name': 'ERROR',
       'dex_no': NaN,
@@ -78,17 +58,21 @@ async function fetchPokemon(input) {
         }
       ]
     });
+  }
+  const species = await resp_1.json();
+  const id = await species.id;
+  const resp_2 = await fetch(species.varieties[0].pokemon.url);
+  const pokemon = await resp_2.json();
+  if(depth === 0){
+    return [parsePokemon(pokemon,species)];
   } else {
-    const species = await resp_1.json();
-    const resp_2 = await fetch(species.varieties[0].pokemon.url);
-    const pokemon = await resp_2.json();
-    return parsePokemon(pokemon, species);
+    return [parsePokemon(pokemon, species)].concat(fetchPokemon(id % totalPokemon + 1, depth - 1));
   }
 }
 
 
 function parsePokemon(pokemon, species){
-  // console.log(pokemon,species);
+  console.log(pokemon,species);
 
   const getSprites = () => {
     return {
@@ -139,69 +123,96 @@ function parsePokemon(pokemon, species){
 }
 
 function renderPokemon(data){
+  let search_result = document.createElement('table');
+  search_result.class = 'search-result'
+  search_result.id = `pkmn${data.dex_no}`;
+  search_result.innerHTML =
+    `<thead>
+    <tr>
+      <td colspan="3" class="name"></td>
+      <td class="dex-no"></td>
+      <td rowspan="3" class="flavor-text"></td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="2" class="sprite"></td>
+      <td colspan="2" class="types"></td>
+    </tr>
+    <tr>
+      <td colspan="2" class="abilities"></td>
+    </tr>
+    </thead>`
   const renderSprite = () => {
     const sprite = document.createElement('img');
     const source =
       artMode? data.sprites.official_art
       : data.sprites.pixel_sprite;
-
     sprite.alt = data.name;
     sprite.src =
       (source === null)? './src/images/null_sprite.png'
       : source;
-    outputWindow.sprite.appendChild(sprite);
+      search_result.querySelector('.sprite').appendChild(sprite);
   }
   const renderName = () => {
     const name = document.createElement('h2');
     name.innerHTML = data.name;
-    outputWindow.name.appendChild(name);
+    search_result.querySelector('.name').appendChild(name);
   }
   const renderDexNo = () => {
     const dexNo = document.createElement('p');
     dexNo.innerHTML = 
       `#${'0'.repeat(4 - Math.log10(data.dex_no+1)) + data.dex_no}`
-    outputWindow.dex_no.appendChild(dexNo);
+      search_result.querySelector('.dex-no').appendChild(dexNo);
   }
   const renderFlavorText = () => {
     const flavText = document.createElement('p');
     flavText.innerHTML = data.flavor_text;
-    outputWindow.flavor_text.appendChild(flavText);
+    search_result.querySelector('.flavor-text').appendChild(flavText);
   }
   const renderAbilities = () => {
-    const label = document.createElement('h3');
-    label.innerHTML = "Abilities:";
-    outputWindow.abilities_label.appendChild(label);
-
-    const abList = document.createElement('ul');
-    data.abilities.forEach((ability) => {
-      if(!(ability.name === data.abilities[0].name && ability.is_hidden)){
-        const abNode = document.createElement('li');
-        abNode.innerHTML = 
-          `${ability.is_hidden?'<i>':''}
-          ${ability.name}
-          ${ability.is_hidden?'</i>':''}`;
-        abList.appendChild(abNode);
-      }
+    const abilities = document.createElement('table');
+    abilities.class = 'ab-table'
+    abilities.innerHTML = 
+    `<thead>
+      <tr>
+        <th colspan="${data.abilities.length}"><b>Abilities:</b></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr></tr>
+    </tbody>`
+    ab_list = abilities.querySelector('tbody>tr');
+    data.abilities.forEach(ability => {
+      let td = document.createElement('td');
+      td.innerHTML = `${ability.is_hidden ? `<i>${ability.name}</i>` : ability.name}`;
+      ab_list.appendChild(td);
     });
-    outputWindow.abilities.appendChild(abList);
+    search_result.querySelector('.abilities').appendChild(abilities);
   }
   const renderTypes = () => {
     data.types.forEach((type) => {
       const typeIcon = document.createElement('img');
       typeIcon.src = `./src/images/${type}.png`;
       typeIcon.alt = titleCase(type);
-      outputWindow.types.appendChild(typeIcon);
+      search_result.querySelector('.types').appendChild(typeIcon);
     });
   }
   
-  clearScreen();
   renderSprite();
   renderName();
   renderDexNo();
   renderFlavorText();
   renderAbilities();
   renderTypes();
-  return data;
+  output.appendChild(search_result);
+}
+
+function switchSprites(){
+  const pokemonOnScreen = document.querySelector('#output').childNodes;
+  for(let i in pokemonOnScreen){
+    artMode = !artMode;
+    let this_sprite = pokemonOnScreen[i].querySelector('.sprite');
+    this_sprite.src = currentPkmnData[i].sprites[artMode? 'official_art' : 'pixel_sprite']
+  }
 }
 
 document.addEventListener("DOMContentLoaded", main);
@@ -224,7 +235,7 @@ async function main(){
   }
 
   currentPkmnData = await fetchPokemon(Math.floor(Math.random() * totalPokemon) + 1);
-  currentPkmnId = await currentPkmnData.dex_no;
+  currentPkmnId = await currentPkmnData[0].dex_no;
 
   document.addEventListener("submit", async function(ev){
     ev.preventDefault();
@@ -236,7 +247,8 @@ async function main(){
     if(ev.target !== search_bar){
       if(ev.key === ' '){
         artMode = !artMode;
-        renderPokemon(currentPkmnData);
+        clearScreen();
+        fetchPokemon(currentPkmnId);
       }
       if(ev.key === 'ArrowRight') nextPkmn();
       if(ev.key === 'ArrowLeft') prevPkmn();
@@ -245,11 +257,11 @@ async function main(){
     
     
 
-  nextButton.addEventListener('mousedown', async function(ev){
-    if (ev.button === 0) nextPkmn();
-  });
+  // nextButton.addEventListener('mousedown', async function(ev){
+  //   if (ev.button === 0) nextPkmn();
+  // });
 
-  prevButton.addEventListener('mousedown', async function(ev){
-    if(ev.button === 0) prevPkmn();
-  });
+  // prevButton.addEventListener('mousedown', async function(ev){
+  //   if(ev.button === 0) prevPkmn();
+  // });
 }

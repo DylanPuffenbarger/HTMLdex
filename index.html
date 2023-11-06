@@ -12,47 +12,17 @@
 
 <body>
   <main>
-    <section id="page-header">
-    <h1>HTMLdex</h1>
+    <div id="page-header">
+      <h1>HTMLdex</h1>
+      <form>
+        <label for="search-bar">Search for a Pokémon:</label>
+        <input id="search-bar" type="text" placeholder="Enter name or ID" />
+        <input type="submit">
+      </form>
+    </div>
 
-    <form>
-      <label for="search-bar">Search for a Pokémon:</label>
-      <input id="search-bar" type="text" placeholder="Enter name or ID" />
-      <input type="submit">
-    </form>
-    </section>
-
-    <table id="search-result">
-      <thead>
-        <tr>
-          <th id="name" colspan="3" class="output-segment"></th>
-          <th id="dex-no"  class="output-segment"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th id="sprite" class="output-segment" colspan="2" rowspan="2"></th>
-          <th id="types" colspan="2"></th>
-        </tr>
-        <tr>
-          <td id="abilities-label"></td>
-          <td id="abilities"></td>
-        </tr>
-        <tr>
-          <td colspan="4" id="flavor-text" class="output-segment"></td>
-        </tr>
-        <tr>
-          <td id="prev-pkmn">
-            <input id="prev-pkmn-btn" type="button" value="⇦"></input>
-          </td>
-          <td></td>
-          <td></td>
-          <td id="next-pkmn">
-            <input id="next-pkmn-btn" type="button" value="⇨"></input>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div id="output">
+    </div>
   </main>
   <script src="./src/index.js"></script>
 </body>

@@ -26,10 +26,11 @@ function titleCase(str){
   }
 }
 
+function clearTopResult(){
+  output.removeChild(output.firstChild);
+}
 function clearScreen(){
-  while(output.hasChildNodes()){
-    output.removeChild(output.firstChild);
-  }
+  while(output.hasChildNodes()) clearTopResult();
 }
 
 async function fetchPokemon(input, depth=4) {
@@ -60,7 +61,7 @@ async function fetchPokemon(input, depth=4) {
     });
   }
   const species = await resp_1.json();
-  const id = await species.id;
+  const id = species.id;
   const resp_2 = await fetch(species.varieties[0].pokemon.url);
   const pokemon = await resp_2.json();
   if(depth === 0){
@@ -220,19 +221,18 @@ document.addEventListener("DOMContentLoaded", main);
 let currentPkmnId
 let currentPkmnData
 
+async function nextPkmn(){
+  clearScreen();
+  currentPkmnId = currentPkmnId % totalPokemon + 1;
+  currentPkmnData = fetchPokemon(currentPkmnId);
+}
+async function prevPkmn(){
+  clearScreen();
+  currentPkmnId = (currentPkmnId===1? totalPokemon : currentPkmnId-1);
+  currentPkmnData = await fetchPokemon(currentPkmnId);
+}
+
 async function main(){
-  async function nextPkmn(){
-    currentPkmnData = await fetchPokemon((currentPkmnId) % totalPokemon + 1);
-    currentPkmnId = await currentPkmnData.dex_no;
-  }
-  async function prevPkmn(){
-    if(currentPkmnId === 1){
-      currentPkmnData = await fetchPokemon(totalPokemon);
-    }else{
-      currentPkmnData = await fetchPokemon(currentPkmnId-1);
-    }
-    currentPkmnId = await currentPkmnData.dex_no;
-  }
 
   currentPkmnData = await fetchPokemon(Math.floor(Math.random() * totalPokemon) + 1);
   currentPkmnId = await currentPkmnData[0].dex_no;
@@ -250,18 +250,18 @@ async function main(){
         clearScreen();
         fetchPokemon(currentPkmnId);
       }
-      if(ev.key === 'ArrowRight') nextPkmn();
-      if(ev.key === 'ArrowLeft') prevPkmn();
+      if(['ArrowRight', 'ArrowDown'].includes(ev.key)) nextPkmn();
+      if(['ArrowLeft', 'ArrowUp'].includes(ev.key)) prevPkmn();
     }
   });
     
     
 
-  // nextButton.addEventListener('mousedown', async function(ev){
-  //   if (ev.button === 0) nextPkmn();
-  // });
+  nextButton.addEventListener('mousedown', async function(ev){
+    if (ev.button === 0) nextPkmn();
+  });
 
-  // prevButton.addEventListener('mousedown', async function(ev){
-  //   if(ev.button === 0) prevPkmn();
-  // });
+  prevButton.addEventListener('mousedown', async function(ev){
+    if(ev.button === 0) prevPkmn();
+  });
 }

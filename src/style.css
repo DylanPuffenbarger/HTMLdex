@@ -1,42 +1,38 @@
-#abilities {
-    text-align: left;
+#output>table{
+    background-color: rgb(165, 44, 44);
+    border-radius: 0;
+    max-width: 1000px;
+    margin: auto;
+}
+.abilities{
+    background: none;
     font-family: 'Courier New', Courier, monospace;
-    font-weight: bold;
+    margin: auto;
+    text-align: center;
 }
-
-#abilities-label {
-    text-align: right;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+.abilities td {
+    border-top: 2px solid rgb(0, 106, 106);
+    border-bottom: 2px solid rgb(0, 106, 106);
 }
+.abilities td+td { border-left: 2px solid rgb(0, 106, 106); } 
 
-#name {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
-}
+.name {font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif}
 
-#next-pkmn-btn {
-    float: right
-}
+#next-pkmn-btn {float: right}
 
-.output-segment{
+.abilities, .dex-no, .flavor-text, .name, .sprite, .types{
     border: 5px solid teal;
     border-radius: 4px;
-    background: linear-gradient(to top, lightblue, teal), url(https://picsum.photos/1280/853/?random=1) no-repeat top center; /* https://stackoverflow.com/a/60320143 */
+    background: linear-gradient(to top, lightblue, teal);
     padding: 10px;
 }
 
-#search-result{
-    background-color: rgb(165, 44, 44);
-    border-radius: 0;
-    max-width: 600px;
-    margin: auto;
-}
-
-#sprite>img{
+.sprite>img{
     height: 150px;
     width: auto;
 }
 
-#types>img {
+.types>img{
     border: 5px solid teal;
     border-radius: 4px;
     width: 100px;
@@ -46,7 +42,6 @@
     text-align: center;
 }
 
-#flavor-text>*,#dex-no{
+.flavor-text>*, .dex-no{
     font-family: 'Courier New', Courier, monospace;
-    /* font-weight: bold; */
 }

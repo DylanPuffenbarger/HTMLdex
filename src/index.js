@@ -26,11 +26,10 @@ function titleCase(str){
   }
 }
 
-function clearTopResult(){
-  output.removeChild(output.firstChild);
-}
 function clearScreen(){
-  while(output.hasChildNodes()) clearTopResult();
+  while(output.hasChildNodes()){
+    output.removeChild(output.firstChild)
+  };
 }
 
 async function fetchPokemon(input, depth=4) {
@@ -239,8 +238,9 @@ async function main(){
 
   document.addEventListener("submit", async function(ev){
     ev.preventDefault();
+    clearScreen();
     currentPkmnData = await fetchPokemon(search_bar.value);
-    currentPkmnId = await currentPkmnData.dex_no;
+    currentPkmnId = await currentPkmnData[0].dex_no;
   });
 
   document.addEventListener("keydown", function(ev){
